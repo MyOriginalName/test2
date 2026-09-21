@@ -1,0 +1,35 @@
+services:
+  web:
+    build: .
+    container_name: catalog_demo_web
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - ./:/var/www
+    environment:
+      DB_HOST: db
+      DB_NAME: catalog_demo
+      DB_USER: catalog_user
+      DB_PASSWORD: catalog_password
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mysql:5.7
+    container_name: catalog_demo_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: catalog_demo
+      MYSQL_USER: catalog_user
+      MYSQL_PASSWORD: catalog_password
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: --character-set-server=utf8 --collation-server=utf8_general_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped

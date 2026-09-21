@@ -1,0 +1,10 @@
+.git
+.gitignore
+README.md
+SOLUTION.md
+*.md
+tests
+database
+docker-compose.yml
+docker-compose.override.yml
+node_modules
